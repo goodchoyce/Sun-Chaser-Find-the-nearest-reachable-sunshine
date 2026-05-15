@@ -15,6 +15,10 @@ def sun_band(score: float) -> str:
 
 
 def calculate_sun_score(row):
+    # Start at 100 and subtract penalties. Weights are tuned so cloud cover
+    # is the dominant signal, rain probability is secondary, and a comfortable
+    # temperature nudges the score up a touch. Final value is clamped to
+    # [0, 110] so the temperature bonus can briefly push above 100.
     score = 100.0
 
     cloud_cover = row.get("cloud_cover") or 0
@@ -22,16 +26,17 @@ def calculate_sun_score(row):
     precipitation = row.get("precipitation") or 0
     temp = row.get("temperature_2m")
 
-    # Cloud cover penalty: 100% cloud = -50 points
+    # 100% cloud cover costs 50 points.
     score -= cloud_cover * 0.5
 
-    # Precipitation probability penalty: 100% = -30 points
+    # 100% rain probability costs 30 points.
     score -= precip_prob * 0.3
 
-    # Precipitation amount penalty: capped at -20
+    # Actual precipitation in mm. Capped so a single thunderstorm reading
+    # doesn't completely sink an otherwise good forecast.
     score -= min(precipitation * 10, 20)
 
-    # Temperature bonus for comfortable weather
+    # Comfortable warmth gets a small bonus, anything outside that range gets nothing.
     if temp is not None:
         if 18 <= temp <= 26:
             score += 10

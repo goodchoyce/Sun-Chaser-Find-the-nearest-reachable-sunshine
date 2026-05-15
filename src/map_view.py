@@ -1,6 +1,7 @@
 import folium
 import pandas as pd
 
+# Calm cyber palette. Each colour is picked to read clearly on the dark map tile.
 BAND_COLORS = {
     "Sun hit":   "#FFD700",  # gold
     "Promising": "#00E676",  # cyber green
@@ -11,6 +12,8 @@ BAND_COLORS = {
 
 
 def score_to_color(score: float) -> str:
+    # Thresholds mirror sun_band() in scoring.py. Keep the two in sync if
+    # the bands ever change, otherwise the labels and colours will disagree.
     if score >= 85:
         return BAND_COLORS["Sun hit"]
     elif score >= 70:
@@ -39,7 +42,8 @@ def build_map(
         tiles="CartoDB dark_matter",
     )
 
-    # Start location marker — bright pin stands out on dark tile
+    # Start location marker. Uses a DivIcon with a pin emoji so it stays
+    # bright on the dark tile without needing a custom image asset.
     folium.Marker(
         location=[start_lat, start_lon],
         popup=folium.Popup(f"<b>{start_name}</b><br>Your start location", max_width=180),

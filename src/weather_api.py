@@ -18,10 +18,14 @@ def fetch_weather(lat, lon):
         resp.raise_for_status()
         data = resp.json()
 
+        # Open-Meteo splits the response into "current" (single snapshot) and
+        # "hourly" (parallel arrays). We pull the snapshot for most fields.
         current = data.get("current", {})
         hourly = data.get("hourly", {})
 
-        # Average precipitation probability over next 6 hours
+        # Rain probability is hourly only. Average the next six hours so a
+        # brief sunny gap in the forecast doesn't make the location look safer
+        # than it really is.
         precip_probs = hourly.get("precipitation_probability", [])
         precip_prob = round(sum(precip_probs[:6]) / 6, 1) if precip_probs else 0
 

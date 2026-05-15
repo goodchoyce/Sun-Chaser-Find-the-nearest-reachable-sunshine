@@ -120,6 +120,8 @@ CITY_DB = [
 # ---------------------------------------------------------------------------
 
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    # Great-circle distance between two lat/lon points. R is the earth's
+    # radius in km, so the result comes out in km too.
     R = 6371.0
     φ1, φ2 = math.radians(lat1), math.radians(lat2)
     dφ = math.radians(lat2 - lat1)
@@ -129,6 +131,8 @@ def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 
 def _initial_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    # Forward azimuth from point 1 to point 2, normalised to 0-360 degrees
+    # where 0 is north and angles run clockwise.
     φ1, φ2 = math.radians(lat1), math.radians(lat2)
     dλ = math.radians(lon2 - lon1)
     x = math.sin(dλ) * math.cos(φ2)
@@ -138,7 +142,8 @@ def _initial_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> floa
 
 def _bearing_to_direction(bearing: float) -> str:
     dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
-    # shift by half a sector so boundaries land between labels
+    # Each label covers a 45 degree sector centred on its bearing, so shift
+    # by 22.5 first to push sector boundaries between labels rather than on them.
     return dirs[int((bearing + 22.5) / 45) % 8]
 
 
